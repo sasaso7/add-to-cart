@@ -12,6 +12,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
+  createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 const appSettings = {
   apiKey: "AIzaSyAd9jeS2_OF-bxn8nTpIdJpMlvbKftt-jg",
@@ -56,6 +57,56 @@ onAuthStateChanged(auth, (user) => {
 });
 
 const loginButton = document.getElementById("login-button");
+const signupButton = document.getElementById("signup-button");
+
+signupButton.addEventListener("click", () => {
+    const mainContainer = document.getElementById("main-container");
+
+    const signupDiv = document.createElement("div");
+    signupDiv.id = "signup-div";
+
+    const signupError = document.createElement("div");
+
+    const signupEmail = document.createElement("input");
+    signupEmail.id = "signup-email";
+    signupEmail.type = "text";
+    signupEmail.placeholder = "Email";
+
+    const signupPassword = document.createElement("input");
+    signupPassword.id = "signup-password";
+    signupPassword.type = "password";
+    signupPassword.placeholder = "Password"
+
+    const signupQuit = document.createElement("button");
+    signupQuit.innerHTML = "<img class=\"button-image\" src=\"assets/close.png\">";
+    signupQuit.id = "signup-quit";
+    signupQuit.addEventListener("click", () => {
+        signupDiv.remove();
+    })
+
+    const signupButton = document.createElement("button");
+    signupButton.id = "signupButton";
+    signupButton.innerHTML = "Complete"
+    signupButton.addEventListener("click", () => {
+        signupError.innerHTML = "";
+        const email = signupEmail.value;
+        const password = signupPassword.value;
+        createUserWithEmailAndPassword(auth, email, password).then(() => {
+
+        }).catch((error) => {
+            signupError.innerHTML = `<div>${error.code}<div><div>${error.message}</div>`
+        })
+    })
+
+
+    signupDiv.append(signupEmail);
+    signupDiv.append(signupPassword);
+    signupDiv.append(signupButton);
+    signupDiv.append(signupError);
+    signupDiv.append(signupQuit)
+    mainContainer.append(signupDiv);
+})
+
 
 loginButton.addEventListener("click", () => {
   const emailValue = document.getElementById("input-email").value;
@@ -145,37 +196,6 @@ const shareWithButtonEl = document.getElementById("share");
     document.location.reload();
   });
 
-// onValue(sharedList, (snapshot) => {
-//     if(snapshot.exists()) {
-//         const sharedListEmail = ref(database, `sharedWith/${replacePeriodWithZero(userEmail)}`);
-//         onValue(sharedListEmail, (snapshot2) => {
-//             if(snapshot2.exists()){
-//                 const userArray = Object.values(snapshot2.val());
-//                 userArray.forEach((user) => {
-//                     const shoppingListInDBPersonified = ref(database, `shoppingList/${replacePeriodWithZero(user)}`)
-//                     onValue(shoppingListInDB, function (snapshot) {
-//                         if (snapshot.exists()) {
-//                           let itemsArray = Object.entries(snapshot.val());
-                    
-//                           clearShoppingListEl();
-                    
-//                           for (let i = 0; i < itemsArray.length; i++) {
-//                             let currentItem = itemsArray[i];
-//                             let currentItemID = currentItem[0];
-//                             let currentItemValue = currentItem[1];
-                    
-//                             appendItemToShoppingListEl(currentItem);
-//                           }
-//                         } else {
-//                           const shoppingListEl = document.getElementById("shopping-list");
-//                           shoppingListEl.innerHTML = "No items to shop...";
-//                         }
-//                     });
-//                 })
-//             }
-//         })
-//     }
-// })
 
 onValue(shoppingListInDB, function (snapshot) {
     if (snapshot.exists()) {
